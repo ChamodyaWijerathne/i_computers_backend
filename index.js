@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import userRouter from "./router/userRouter.js";
 import productRouter from "./router/productRouter.js";
 import authorizeUser from "./lib/jwdMiddleware.js";
+import cors from "cors";
+
 
 
 //mongoDB connection string
@@ -21,6 +23,8 @@ mongoose.connect(mongoURL).then(
 
 //create express app
 const app = express();
+
+app.use(cors())
 
 //middleware to parse json body
 app.use(express.json())

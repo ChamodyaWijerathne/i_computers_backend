@@ -26,14 +26,35 @@ export function createUser(req, res) {
             )
         }
     ).catch(
-        () => {
+        (error) => {
             res.json(
                 {
-                    message : "Error creating user"
+                    message : "Error creating user", error: error.message
                 }
             )
         }
     )
+}
+
+export async function createUserAsync(req, res) {
+	const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
+	const user = new User({
+		email: req.body.email,
+		firstName: req.body.firstName,
+		lastName: req.body.lastName,
+		password: hashedPassword,
+	});
+	try {
+		
+		await user.save();
+		res.json({ message: "User created successfully" });
+
+	} catch (error) {
+
+		res.json({ message: "Error creating user", error: error });
+
+	}
 }
 
 export function loginUser(req,res) {

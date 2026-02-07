@@ -40,7 +40,7 @@ export async function createProduct(req, res) {
         return;
        }
        data.name = req.body.name;
-       data.description = req.body.description || "";
+       data.description = req.body.description || ""; //if description is not provided, set it to empty string
        data.altName =  req.body.altNames || []
 
        if(req.body.price == null){
@@ -53,12 +53,12 @@ export async function createProduct(req, res) {
        }
 
        data.price = req.body.price;
-       data.labeledPrice =  req.body.labeledPrice || req.body.price
-       data.category = req.body.category || "others"
+       data.labeledPrice =  req.body.labeledPrice || req.body.price;
+       data.category = req.body.category || "others";
        data.images = req.body.images || ["/images/default_product-1.jpg", "/images/default_product -2.jpg"]
-       data.isVisible = req.body.isVisible
-       data.brand = req.body.brand || "Generic"
-       data.model = req.body.model || "Standard"
+       data.isVisible = req.body.isVisible;
+       data.brand = req.body.brand || "Generic";
+       data.model = req.body.model || "Standard";
 
        const newProduct = new Product(data);
 
@@ -73,7 +73,7 @@ export async function createProduct(req, res) {
     }catch(error){
         res.status(500).json(
             {
-                message: "Error creating product"
+                message: "Error creating product", error: error
             }
         )
     }
@@ -93,7 +93,7 @@ export async function getProducts(req,res){
     }catch(error){
         res.status(500).json(
             {
-                message: "Error fetching products", error: error.message
+                message: "Error fetching products", error: error
             }
         )
     }
@@ -119,7 +119,7 @@ export async function deleteProduct(req,res) {
     }catch(error){
         res.status(500).json(
             {
-                message: "Error deleting product", error: error.message
+                message: "Error deleting product", error: error
             }
         )
     }
@@ -154,7 +154,7 @@ export async function updateProduct(req,res) {
        }
        data.name = req.body.name;
        data.description = req.body.description || "";
-       data.altName =  req.body.altNames || []
+       data.altName =  req.body.altNames || [];
 
        if(req.body.price == null){
         res.status(400).json(
@@ -166,27 +166,25 @@ export async function updateProduct(req,res) {
        }
 
        data.price = req.body.price;
-       data.labeledPrice =  req.body.labeledPrice || req.body.price
-       data.category = req.body.category || "others"
-       data.images = req.body.images || ["/images/default_product-1.jpg", "/images/default_product -2.jpg"]
-       data.isVisible = req.body.isVisible
-       data.brand = req.body.brand || "Generic"
-       data.model = req.body.model || "Standard"
+       data.labeledPrice =  req.body.labeledPrice || req.body.price;
+       data.category = req.body.category || "others";
+       data.images = req.body.images || ["/images/default_product-1.jpg", "/images/default_product-2.jpg"];
+       data.isVisible = req.body.isVisible;
+       data.brand = req.body.brand || "Generic";
+       data.model = req.body.model || "Standard";
 
-       await Product.updateOne({ productId: productId},data)
+       await Product.updateOne({ productId: productId},data);
 
        
        res.status(201).json(
         {
             message: "Product updated successfully"
         }
-       )
-
-
+       );
     }catch(error){
         res.status(500).json(
             {
-                message: "Error updating product"
+                message: "Error updating product", error: error
             }
         )
     }
