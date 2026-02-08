@@ -66,7 +66,7 @@ export function loginUser(req,res) {
     ).then(
         (user) => {
             if(user == null){
-                res.json(
+                res.status(401).json(
                     {
                         message : "User with this email does not exist"
                     }
