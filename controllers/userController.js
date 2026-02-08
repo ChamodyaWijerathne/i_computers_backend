@@ -1,6 +1,9 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import dotenv from "dotenv";
+
+dotenv.config() //load environment variables from .env file
 
 
 export function createUser(req, res) {
@@ -66,7 +69,7 @@ export function loginUser(req,res) {
     ).then(
         (user) => {
             if(user == null){
-                res.status(401).json(
+                res.status(404).json(
                     {
                         message : "User with this email does not exist"
                     }
@@ -83,14 +86,15 @@ export function loginUser(req,res) {
                         role : user.role,
                         image : user.image,
                         isEmailVerified : user.isEmailVerified
-                    }, "i-computers-54!")
+                    }, process.env.JWT_SECRET)
 
                     console.log("Generated Token : ", token)
 
                     res.json(
                         {
                             message: "Login successful",
-                            token : token
+                            token : token,
+                            role: user.role
                         }
                     )
                 } else {
