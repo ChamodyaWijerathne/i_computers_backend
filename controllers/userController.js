@@ -86,9 +86,12 @@ export function loginUser(req,res) {
                         role : user.role,
                         image : user.image,
                         isEmailVerified : user.isEmailVerified
-                    }, process.env.JWT_SECRET)
+                    }, process.env.JWT_SECRET,
+                    {expiresIn : req.body.rememberMe?"30d":"48h"}
+                    //if rememberMe is true, token will expire in 30 days, otherwise it will expire in 48 hours
+                )
 
-                    console.log("Generated Token : ", token)
+                    
 
                     res.json(
                         {
