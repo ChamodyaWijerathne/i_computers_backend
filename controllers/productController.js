@@ -41,7 +41,7 @@ export async function createProduct(req, res) {
        }
        data.name = req.body.name;
        data.description = req.body.description || ""; //if description is not provided, set it to empty string
-       data.altName =  req.body.altNames || []
+       data.altNames =  req.body.altNames || []
 
        if(req.body.price == null){
         res.status(400).json(
@@ -154,7 +154,7 @@ export async function updateProduct(req,res) {
        }
        data.name = req.body.name;
        data.description = req.body.description || "";
-       data.altName =  req.body.altNames || [];
+       data.altNames =  req.body.altNames || [];
 
        if(req.body.price == null){
         res.status(400).json(
