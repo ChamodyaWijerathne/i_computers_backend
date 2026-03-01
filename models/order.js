@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     },
     addressLine1:{
         type: String,
-        required: trusted
+        required: true
     },
     addressLine2:{
         type: String
@@ -79,6 +79,13 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true,
         default: "Pending"
+    },
+    date:{
+        type: Date,
+        default: Date.now
+    },
+    notes:{
+        type: String
     }
 })
 

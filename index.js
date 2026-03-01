@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import userRouter from "./router/userRouter.js";
 import productRouter from "./router/productRouter.js";
+import orderRouter from "./router/orderRouter.js";
 import authorizeUser from "./lib/jwdMiddleware.js";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -34,8 +35,10 @@ app.use(authorizeUser)
 
 app.use("/api/users", userRouter)
 app.use("/api/products", productRouter)
+app.use("/api/orders", orderRouter)
+
 
 app.listen(3000, () =>{
-    console.log("Server is running on port" );
+    console.log("Server is running on port 3000");
     }
 )
