@@ -1,22 +1,64 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 
+
 export async function createOrder(req, res) {
+
+	if(req.user == null){
+		res.status(401).json({
+			message: "Unauthorized. Please login to place an order."
+		})
+		return
+	}
+
   try {
     const orderData = {
       orderId: "ORD000001",
-      firstName: "John",
-      lastName: "Doe",
-      addressLine1: "123 Main St",
-      addressLine2: "Apt 4B",
-      city: "Colombo",
-      country: "Sri Lanka",
-      postalCode: "12345",
-      email: "john.doe@example.com",
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      addressLine1: req.body.addressLine1,
+      addressLine2: req.body.addressLine2,
+      city: req.body.city,
+      country: req.body.country,
+      postalCode: req.body.postalCode,
+      email: req.user.email,
       items: [],
-      phone: "1234567890",
+      phone: req.body.phone,
       total: 0,
     };
+
+    if (orderData.firstName == "") {
+      orderData.firstName = req.user.firstName
+    }
+  if (orderData.lastName == "") {
+		orderData.lastName = req.user.lastName
+	}
+  if (orderData.addressLine1 == "") {
+		res.status(400).json({
+			message: "Address Line 1 is required"
+		})
+		return
+	}
+  if (orderData.addressLine2 == "") {
+		res.status(400).json({
+			message: "Address Line 2 is required"
+		})
+	return
+	}
+  if (orderData.city == "") {
+		res.status(400).json({
+			message: "City is required"
+		})
+	return
+	}	
+  if (orderData.phone == "") {
+		res.status(400).json({
+			message: "Phone is required"
+		})
+	return
+	}
+
+		
 
     const lastOrder = await Order.findOne().sort({ date: -1 });
 
@@ -25,7 +67,7 @@ export async function createOrder(req, res) {
       const lastOrderNumberInString = lastOrderId.replace("ORD", ""); //"000029"
       const lastOrderNumber = parseInt(lastOrderNumberInString); //29
       const newOrderNumber = lastOrderNumber + 1; //30
-      const newOrderNumberInString = newOrderNumber.toString().padStart(6, 0); //"000030"
+      const newOrderNumberInString = newOrderNumber.toString().padStart(6, "0"); //"000030"
       orderData.orderId = "ORD" + newOrderNumberInString; //"ORD000030"
     }
 
