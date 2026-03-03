@@ -128,3 +128,17 @@ export async function createOrder(req, res) {
     res.status(500).json({ message: "Failed to create order" });
   }
 }
+
+export async function getOrders(req, res){
+	if(req.user == null){
+		res.status(401).json(
+			{
+				message: "Unauthorized. Please login to view your orders."
+			}
+		)
+	}
+
+	if(isAdmin(req)){
+		
+	}
+}
