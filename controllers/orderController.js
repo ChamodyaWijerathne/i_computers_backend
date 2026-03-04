@@ -138,7 +138,23 @@ export async function getOrders(req, res){
 		)
 	}
 
-	if(isAdmin(req)){
-		
+	const pageSizeString = req.params.pageSize || "10"
+	const pageNumberString = req.params.pageNumber || "1"
+
+	const pageNumber = parseInt(pageNumberString)
+	const pageSize = parseInt(pageSizeString)
+
+	try{
+		if(isAdmin(req)){
+			const numberOfOrders = await Order.countDocuments()//total number of orders in the collection
+			const numberOfPages = Math.ceil(numberOfOrders/pageSize)
+
+			const orders = await Order.find().sort({date: -1}).skip((pageNumber-1) * pageSize).limit(pageSize)//
+
+		}
+	}catch(error){
+		console.error("Error fetching orders:", error)
+		res.status(500).json({message: "Failed to fetch orders"})
+
 	}
 }
