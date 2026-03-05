@@ -35,6 +35,7 @@ app.use(authorizeUser)
 
 app.use("/api/users", userRouter)
 app.use("/api/products", productRouter)
+app.use("/api/order", orderRouter)
 app.use("/api/orders", orderRouter)
 
 

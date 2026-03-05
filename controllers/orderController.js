@@ -1,5 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
+import { isAdmin } from "./userController.js";
 
 
 export async function createOrder(req, res) {
@@ -136,6 +137,7 @@ export async function getOrders(req, res){
 				message: "Unauthorized. Please login to view your orders."
 			}
 		)
+    return
 	}
 
 	const pageSizeString = req.params.pageSize || "10"
@@ -149,9 +151,26 @@ export async function getOrders(req, res){
 			const numberOfOrders = await Order.countDocuments()//total number of orders in the collection
 			const numberOfPages = Math.ceil(numberOfOrders/pageSize)
 
-			const orders = await Order.find().sort({date: -1}).skip((pageNumber-1) * pageSize).limit(pageSize)//
+			const orders = await Order.find().sort({date: -1}).skip((pageNumber-1) * pageSize).limit(pageSize) //pagination
 
-		}
+      res.json({
+        orders: orders,
+        totalPages: numberOfPages,
+      
+      })
+
+		}else{
+      const numberOfOrders = await Order.countDocuments()//total number of orders in the collection
+			const numberOfPages = Math.ceil(numberOfOrders/pageSize)
+
+			const orders = await Order.find({email: req.user.email}).sort({date: -1}).skip((pageNumber-1) * pageSize).limit(pageSize) //pagination
+
+      res.json({
+        orders: orders,
+        totalPages: numberOfPages
+      
+      })
+    }
 	}catch(error){
 		console.error("Error fetching orders:", error)
 		res.status(500).json({message: "Failed to fetch orders"})
