@@ -121,6 +121,23 @@ export function loginUser(req,res) {
     )
 }
 
+export function getUser(req,res){
+    if(req.user==null){
+        res.status(401).json({
+            message: "Unauthorized. Please login to view user details."
+        })
+        return
+    }
+    res.json({
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        role: req.user.role,
+        image: req.user.image,
+        isEmailVerified: req.user.isEmailVerified
+    })
+}
+
 export function isAdmin(req) {
     if(req.user == null){
         return false
