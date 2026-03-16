@@ -177,3 +177,26 @@ export async function getOrders(req, res){
 
 	}
 }
+export async function updateOrderStatus(req, res){
+  if(isAdmin(req)){
+    const orderId = req.params.orderId
+    try{
+      await Order.updateOne({orderId: orderId},{status: req.body.status, notes: req.body.notes})
+      res.json({
+        message: "Order status updated successfully"
+      })
+
+    }catch{
+      console.log("Error updating order status")
+      res.status(500).json({
+        message: "Failed to update order status"
+      })
+      return
+    }
+    
+  }else{
+    res.status(403).json({
+      message: "Forbidden. Only admin can update order status."
+    })
+  }
+}
