@@ -138,6 +138,60 @@ export function getUser(req,res){
     })
 }
 
+export async function updateUserProfile(req,res){
+    if(req.user==null){
+        res.status(401).json({
+            message: "Unauthorized. Please login to update user details."
+        })
+        return
+    }
+    try{
+        await User.updateOne(
+        {
+            email: req.user.email
+        },
+        {
+            firstName: req.body.firstName,  
+            lastName: req.body.lastName,
+            image: req.body.image
+        }
+    )
+    }catch(error){
+        res.status(500).json({
+            message: "Error updating user profile",
+            error: error.message
+        })
+        return
+    }
+}
+
+export async function changeUserPassword(req,res){
+    if(req.user==null){
+        res.status(401).json({
+            message: "Unauthorized. Please login to change password."
+        })
+        return
+    }
+    try{
+        const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+        await User.updateOne({
+            email: req.user.email
+        },
+        {
+            password: hashedPassword
+        })
+        res.json({
+            message: "Password changed successfully"
+        })
+    }catch(error){
+        res.status(500).json({
+            message: "Error changing password",
+            error: error.message
+        })
+        return
+    }
+}
+
 export function isAdmin(req) {
     if(req.user == null){
         return false
