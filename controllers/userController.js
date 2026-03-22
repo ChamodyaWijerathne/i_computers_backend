@@ -154,8 +154,25 @@ export async function updateUserProfile(req,res){
             firstName: req.body.firstName,  
             lastName: req.body.lastName,
             image: req.body.image
-        }
-    )
+        })
+        const user = await User.findOne({email: req.user.email})//find user again to get updated details for token generation
+
+        const token = jwt.sign({//generate new token with updated user details
+                        email : user.email,
+                        firstName : user.firstName,
+                        lastName : user.lastName,
+                        role : user.role,
+                        image : user.image,
+                        isEmailVerified : user.isEmailVerified
+                    }, process.env.JWT_SECRET,
+                    {expiresIn : req.body.rememberMe?"30d":"48h"}
+        )
+
+        res.json({
+            message: "User profile updated successfully",
+            token: token
+        })
+
     }catch(error){
         res.status(500).json({
             message: "Error updating user profile",

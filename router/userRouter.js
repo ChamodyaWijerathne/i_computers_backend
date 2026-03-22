@@ -1,6 +1,5 @@
 import express from "express"
-import { createUser, getUser, loginUser } from "../controllers/userController.js"
-import { use } from "react"
+import { changeUserPassword, createUser, getUser, loginUser, updateUserProfile } from "../controllers/userController.js"
 
 const userRouter = express.Router()
 
