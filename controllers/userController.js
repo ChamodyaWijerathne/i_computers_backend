@@ -2,8 +2,21 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv";
+import OTP from "../models/otp.js";
 
 dotenv.config() //load environment variables from .env file
+
+const transpoeter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+})
+
 
 
 export function createUser(req, res) {
@@ -217,5 +230,50 @@ export function isAdmin(req) {
         return false
     }else{
         return true
+    }
+}
+
+export async function sendOTP(req,res){
+    try{
+        const user = await User.findOne({email: req.body.email})
+        if(user == null){
+            res.status(404).json({
+                message: "User with this email does not exist"
+            })
+            return
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000)
+        const newOTP = new OTP({
+            email: req.body.email,
+            otp: otp
+        })
+        await newOTP.save()
+        const message = {
+            from: process.env.EMAIL_USER,
+            to: req.body.email,
+            subject: "Password Reset OTP",
+            text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes.`
+        }
+        transpoeter.sendMail(message, (error, info) => {
+            if(error){
+                res.status(500).json({
+                    message: "Error sending OTP",
+                    error: error.message
+                })
+                
+            }else{
+                res.json({
+                    message: "OTP sent successfully"
+                })
+            }
+
+        }
+    )
+    }catch(error){
+        res.status(500).json({
+            message: "Error sending OTP",
+            error: error.message
+        })
+        return
     }
 }
