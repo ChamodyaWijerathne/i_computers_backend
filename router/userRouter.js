@@ -1,5 +1,5 @@
 import express from "express"
-import { changeUserPassword, createUser, getUser, loginUser, updateUserProfile, sendOTP, verifyOTP } from "../controllers/userController.js"
+import { changeUserPassword, createUser, getUser, loginUser, updateUserProfile, sendOTP, verifyOTP, googleLogin } from "../controllers/userController.js"
 
 const userRouter = express.Router()
 
@@ -9,6 +9,7 @@ userRouter.get("/profile", getUser)
 userRouter.post("/update-password", changeUserPassword) 
 userRouter.post("/send-otp", sendOTP)
 userRouter.post("/verify-otp",verifyOTP)
+userRouter.post("/google-login", googleLogin)
 userRouter.put("/", updateUserProfile)
 
 
