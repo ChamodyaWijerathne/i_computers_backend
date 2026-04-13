@@ -358,3 +358,109 @@ export async function googleLogin(req, res) {
 		return;
 	}
 }
+
+export async function getAllUsers(req, res) {
+	if (!isAdmin(req)) {
+		res.status(403).json({
+			message: "Forbidden. Admin access required to view all users.",
+		});
+		return;
+	}
+	try{
+		const pageSizeString = req.params.pageSize || "10"
+		const pageNumberString = req.params.pageNumber || "1"
+
+		const pageNumber = parseInt(pageNumberString)
+		const pageSize = parseInt(pageSizeString)
+		const numberOfUsers = await User.countDocuments()//total number of users in the collection
+		const numberOfPages = Math.ceil(numberOfUsers/pageSize)//calculate total number of pages based on page size
+
+		const users = await User.find({}).sort({date: -1}).skip((pageNumber-1) * pageSize).limit(pageSize) //pagination
+
+		res.json({
+			users: users,
+			totalPages: numberOfPages,
+			
+		})
+		}catch(error){
+		res.status(500).json({
+			message: "Error fetching users",
+			error: error.message,
+		});
+		
+	}
+}
+
+export async function blockOrUnblockUser(req,res){
+	if (!isAdmin(req)) {
+		res.status(403).json({
+			message: "Forbidden. Admin access required to block or unblock users.",
+		});
+		return;
+	}
+	const email = req.body.email;
+	if(req.user.email == email){
+		res.status(400).json({
+			message: "You cannot block or unblock yourself.",
+		});
+		return;
+	}
+	try{
+		const user = await User.findOne({ email: email });
+		if(user == null){
+			res.status(404).json({
+				message: "User with this email does not exist",
+			});
+			return;
+		}
+		await User.updateOne({email: email}, {isBlocked: !user.isBlocked})//toggle isBlocked field to block or unblock user
+		res.json({
+			message: user.isBlocked ? "User unblocked successfully" : "User blocked successfully",
+		})
+
+	}catch(error){
+		res.status(500).json({
+			message: "Error blocking or unblocking user",
+			error: error.message,
+		});
+		return;
+	}
+}
+
+export async function changeUserRole(req,res){
+	if (!isAdmin(req)) {
+		res.status(403).json({
+			message: "Forbidden. Admin access required to change user roles.",
+		});
+		return;
+	}
+	const email = req.body.email
+	if(req.user.email == email){
+		res.status(400).json({
+			message: "You cannot change your own role.",
+		});
+		return;
+	}
+
+	try{
+		const user = await User.findOne({ email: email });
+		if(user == null){
+			res.status(404).json({
+				message: "User with this email does not exist",
+			});
+			return;
+		}
+		await User.updateOne({email: email}, {role: user.role === "admin" ? "user" : "admin"})//toggle role between admin and user
+		res.json({
+			message: user.role === "admin" ? "User role changed to user successfully" : "User role changed to admin successfully",
+		})
+	}catch(error){
+		res.status(500).json({
+			message: "Error changing user role",
+			error: error.message,
+		});
+		return;
+	}
+}
+
+
