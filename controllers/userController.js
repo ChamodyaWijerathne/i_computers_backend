@@ -71,6 +71,12 @@ export function loginUser(req, res) {
 					message: "User with this email does not exist",
 				});
 			} else {
+				if(user.isBlocked){
+					res.status(403).json({
+						message: "Your account has been blocked. Please contact support for more information.",
+					});
+					return;
+				}
 				const isPasswordValid = bcrypt.compareSync(
 					req.body.password,
 					user.password,
@@ -224,7 +230,7 @@ export async function sendOTP(req, res) {
 			return;
 		}
 		const otp = Math.floor(100000 + Math.random() * 900000);
-		await OTP.delete;
+		await OTP.deleteOne({ email: req.body.email });
 		//delete any existing OTP for this email before creating a new one
 		await OTP.findOneAndUpdate(
 			{ email: req.body.email },
@@ -332,6 +338,12 @@ export async function googleLogin(req, res) {
 				role: newUser.role,
 			});
 		} else {
+			if(User.isBlocked){
+				res.status(403).json({
+					message: "Your account has been blocked. Please contact support for more information.",
+				});
+				return;
+			}
 			const token = jwt.sign(
 				{
 					email: user.email,

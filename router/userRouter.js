@@ -12,8 +12,8 @@ userRouter.post("/verify-otp",verifyOTP)
 userRouter.post("/google-login", googleLogin)
 userRouter.put("/", updateUserProfile)
 userRouter.get("/all/:pageSize/:pageNumber", getAllUsers)
-userRouter.post("/block-user", blockOrUnblockUser)
-userRouter.post("/change-role", changeUserRole)
+userRouter.post("/toggle-block", blockOrUnblockUser)
+userRouter.post("/toggle-role", changeUserRole)
 
 
 export default userRouter
