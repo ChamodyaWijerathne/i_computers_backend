@@ -1,5 +1,6 @@
 import express from "express"
 import { changeUserPassword, createUser, getUser, loginUser, updateUserProfile, sendOTP, verifyOTP, googleLogin, getAllUsers, blockOrUnblockUser, changeUserRole } from "../controllers/userController.js"
+import { getMyReviews } from "../controllers/reviewController.js"
 
 const userRouter = express.Router()
 
@@ -14,6 +15,7 @@ userRouter.put("/", updateUserProfile)
 userRouter.get("/all/:pageSize/:pageNumber", getAllUsers)
 userRouter.post("/toggle-block", blockOrUnblockUser)
 userRouter.post("/toggle-role", changeUserRole)
+userRouter.get("/me/reviews", getMyReviews)
 
 
 export default userRouter
