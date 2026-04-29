@@ -1,5 +1,48 @@
 import { isAdmin } from "./userController.js";
 import Product from "../models/product.js";
+import Review from "../models/review.js";
+
+async function attachReviewSummary(products) {
+    const productList = Array.isArray(products) ? products : [products];
+    const productIds = productList.map((product) => product.productId).filter(Boolean);
+
+    if (productIds.length === 0) {
+        return Array.isArray(products) ? [] : null;
+    }
+
+    const summaries = await Review.aggregate([
+        { $match: { productId: { $in: productIds } } },
+        {
+            $group: {
+                _id: "$productId",
+                reviewCount: { $sum: 1 },
+                averageRating: { $avg: "$rating" },
+            },
+        },
+    ]);
+
+    const summaryMap = new Map(
+        summaries.map((summary) => [summary._id, summary])
+    );
+
+    const withSummary = productList.map((product) => {
+        const summary = summaryMap.get(product.productId) || { reviewCount: 0, averageRating: 0 };
+        const averageRating = Number(summary.averageRating || 0);
+
+        return {
+            ...product,
+            reviewCount: summary.reviewCount || 0,
+            averageRating: averageRating,
+            ratingCount: summary.reviewCount || 0,
+            reviewSummary: {
+                reviewCount: summary.reviewCount || 0,
+                averageRating: averageRating,
+            },
+        };
+    });
+
+    return Array.isArray(products) ? withSummary : withSummary[0] || null;
+}
 
 export async function createProduct(req, res) {
 
@@ -83,11 +126,11 @@ export async function getProducts(req,res){
     try{
 
         if(isAdmin(req)){
-            const products = await Product.find();
-            res.status(200).json(products)
+            const products = await Product.find().lean();
+            res.status(200).json(await attachReviewSummary(products))
         }else{
-            const products = await Product.find({isVisible: true});
-            res.status(200).json(products);
+            const products = await Product.find({isVisible: true}).lean();
+            res.status(200).json(await attachReviewSummary(products));
         }
 
     }catch(error){
@@ -195,7 +238,7 @@ export async function getProductById(req, res){
     try{
 
         const productId = req.params.productId;
-        const product = await Product.findOne({productId: productId});
+        const product = await Product.findOne({productId: productId}).lean();
         
         if(product == null){
             res.status(404).json({
@@ -214,7 +257,7 @@ export async function getProductById(req, res){
             }
 
         }
-        res.status(200).json(product);
+        res.status(200).json(await attachReviewSummary(product));
 
     }catch(error){
          res.status(500).json(
@@ -238,8 +281,8 @@ export async function searchProducts(req, res){
                 isVisible: true
                 
             }
-        )
-        res.status(200).json(products);
+        ).lean()
+        res.status(200).json(await attachReviewSummary(products));
 
     }catch(error){
         res.status(500).json(
